@@ -23,7 +23,7 @@
           console.log("Creating youtube player")
           this.player = new YT.Player(this.$.player, {
             playerVars: {
-              list: "PLyXfMx6QXEe_7vnNEhifiKAtyP9e-x-8f",
+              list: this.playlist,
               listType: "playlist",
               autoplay: 1,
               controls: 0,
