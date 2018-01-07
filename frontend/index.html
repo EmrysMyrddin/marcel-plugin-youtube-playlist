@@ -1,61 +1,78 @@
-<dom-module id="marcel-plugin-youtube-playlist">
-  <template>
-    <div id="player"></div>
-  </template>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>marcel-plugin-twitter</title>
+  <script src="./marcel.js"></script>
+</head>
+
+<body>
+
+  <div id="player"></div>
+
+  <style>
+    body,
+    .player {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
 
   <script>
-    (() => {
-      class YoutubePlaylist extends Polymer.Element {
-        static get is() { return 'marcel-plugin-youtube-playlist' }
-        static get properties() {
-          return {
-            playlist: String,
-          }
-        }
-
-        connectedCallback() {
-          super.connectedCallback();
-
-          this.initYoutubeAPI()
-        }
-
-        onYouTubeIframeAPIReady() {
-          console.log("Creating youtube player")
-          this.player = new YT.Player(this.$.player, {
-            playerVars: {
-              list: this.playlist,
-              listType: "playlist",
-              autoplay: 1,
-              controls: 0,
-              loop: 1,
-              showinfo: 0,
-              fs: 0,
-            },
-            height: '100%',
-            width: '100%',
-            events: {
-              onError: console.error
-            }
-          });
-        }
-
-        initYoutubeAPI() {
-          if (window.YT) return this.onYouTubeIframeAPIReady()
-
-          const id = "youtube-iframe-js", s = "script", src = "https://www.youtube.com/iframe_api"
-
-          const fjs = document.getElementsByTagName(s)[0]
-          const js = document.createElement(s)
-
-          js.id = id
-          js.src = src
-          fjs.parentNode.insertBefore(js, fjs)
-
-          window.onYouTubeIframeAPIReady = this.onYouTubeIframeAPIReady.bind(this)
-        }
+    class YoutubePlaylist extends Marcel.Plugin {
+      constructor() {
+        super()
+        this.player = document.getElementById('player')
+        this.initYoutubeAPI()
       }
 
-      customElements.define(YoutubePlaylist.is, YoutubePlaylist);
-    })();
+      initYoutubeAPI() {
+        if (window.YT) return this.onYouTubeIframeAPIReady()
+
+        const id = "youtube-iframe-js", s = "script", src = "https://www.youtube.com/iframe_api"
+
+        const fjs = document.getElementsByTagName(s)[0]
+        const js = document.createElement(s)
+
+        js.id = id
+        js.src = src
+        fjs.parentNode.insertBefore(js, fjs)
+
+        window.onYouTubeIframeAPIReady = this.onYouTubeIframeAPIReady.bind(this)
+      }
+
+      onYouTubeIframeAPIReady() {
+        console.log("Creating youtube player")
+        this.youtube = new YT.Player(this.player, {
+          playerVars: {
+            list: this.props.playlist,
+            listType: "playlist",
+            autoplay: 1,
+            controls: 0,
+            loop: 1,
+            showinfo: 0,
+            fs: 0,
+          },
+          height: '100%',
+          width: '100%',
+          events: {
+            onError: console.error
+          }
+        });
+        this.initialised = true
+      }
+
+      propsDidChange(prevProps) {
+        if (this.youtube && prevProps.playlist !== this.props.playlist) this.youtube.loadPlaylist({
+          list: this.props.playlist,
+          listType: "playlist",
+        })
+      }
+    }
+
+    const instance = new YoutubePlaylist()
   </script>
-</dom-module>
+</body>
+
+</html>
