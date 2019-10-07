@@ -1,0 +1,14 @@
+{
+  "eltName": "marcel-plugin-youtube-playlist",
+  "name": "Youtube Playlist",
+  "description": "Displays a youtube playlist",
+  "frontend": {
+    "props": [
+      {
+        "name": "playlist",
+        "type": "string",
+        "description": "The youtube playlist id"
+      }
+    ]
+  }
+}
